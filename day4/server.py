@@ -64,9 +64,6 @@ def get_tasks() -> TaskList:
   task_list = get_task_list_from_file()
   return task_list
 
-# class TaskID(BaseModel):
-#   id: int
-
 @app.delete("/task/{id}", status_code=204)
 def delete_task(id: int):
   task_list = get_task_list_from_file()
