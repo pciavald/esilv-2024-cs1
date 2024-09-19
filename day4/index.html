@@ -49,10 +49,10 @@
         await this.getTasks()
       },
       methods: {
-        // async getTasks() {
-        //   const request = await axios.get(`${this.apiUrl}/todos`)
-        //   this.tasks = request.data.tasks
-        // },
+        async getTasks() {
+          const request = await axios.get(`${this.apiUrl}/todos`)
+          this.tasks = request.data.tasks
+        },
         async createTask() {
           // this.tasks.push(this.taskTitle)
           const response = await fetch('localhost:8000/task', {
