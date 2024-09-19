@@ -1,0 +1,72 @@
+
+<head>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <style>
+    #title {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+    .task {
+      border: 1px solid grey;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body id="app">
+
+  <div id="title">
+    TODO app
+  </div>
+
+  <div>
+    <input placeholder="task" v-model="taskTitle"/>
+    <button @click="addTask">OK</button>
+    <div v-for="(task, index) in tasks" class="task">
+      {{ task.title }}
+      <span>
+        <button @click="deleteTask(index)">x</button>
+      </span>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          taskTitle: '',
+          tasks: [],
+          apiUrl: 'http://localhost:8000'
+        }
+      },
+      async mounted() {
+        await this.getTasks()
+      },
+      methods: {
+        // async getTasks() {
+        //   const request = await axios.get(`${this.apiUrl}/todos`)
+        //   this.tasks = request.data.tasks
+        // },
+        async createTask() {
+          // this.tasks.push(this.taskTitle)
+          const response = await fetch('localhost:8000/task', {
+            method: 'POST',
+            body: { title: this.taskTitle },
+          })
+          this.taskTitle = ''
+        },
+        deleteTask(index) {
+          this.tasks.splice(index, 1)
+        },
+      },
+    }).mount('#app')
+  </script>
+
+</body>
+

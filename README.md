@@ -20,11 +20,64 @@
 
 #### **2.1 The Processor: Architecture and Instruction Sets** *(45 minutes)*
 
+[How Do CPUs Work? - ExplainingComputers (YouTube)](https://www.youtube.com/watch?v=jx-w2o-Lj8g)
+
 - **Key Points:**
   - The CPU's role as the brain of the computer—no neurology degree required.
   - Basic fetch-decode-execute cycle—how the CPU takes commands and makes magic happen.
   - Introduction to the Instruction Pointer (EIP) and how it keeps the CPU on track.
   - CPUs vs. GPUs: Why your graphics card can't do your taxes (yet).
+
+- **Notes:**
+
+  - (John) Von Neumann Architecture (1945)
+    - Control Unit
+    - Arithmetic Logic Unit
+    - Memory
+    - Input/Output
+
+  ![alt text](image-2.png)
+
+  - registers can store:
+    - instructions
+    - data
+    - memory addresses
+  - buses:
+    - data
+    - address
+    - control
+
+  - clock
+    - Ghz: billions of cycles per second
+  - fetch, decode, execute cycle
+    - Program Counter or Instruction Pointer
+      - points to the next instruction in memory
+    - Control Unit
+      - fetches the instruction to the Instruction Register
+      - increments the Program Counter
+      - decodes it
+      - executes it
+    
+  ![alt text](image.png)
+  ![alt text](image-1.png)
+
+  - machine code: instruction set of a CPU
+    - assembly language
+      - low-level programming language
+      - still compiled to machine code
+    - x86 (Intel 8086, 1978)
+      - CISC (Complex Instruction Set Computer)
+      - [opcodes](http://ref.x86asm.net/coder32.html)
+      ![alt text](image-3.png)
+    - ARM
+      - RISC (Instruction Set Computer)
+        - less specialised instructions
+        - more instructions to execute a task
+        - faster execution because easier to optimise
+      - just a licence used by Apple, Qualcomm, Samsung, etc.
+      ![alt text](image-4.png)
+    - RISC-V
+      - like ARM but open-source
 
 #### **2.2 Storage** *(30 minutes)*
 
