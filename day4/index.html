@@ -2,75 +2,244 @@
 <head>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.6.0/css/all.css">
 
   <style>
+
+    /* Classes */
+
+    .button {
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .button:hover {
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.1)
+    }
+    .strike {
+      text-decoration: line-through;
+      font-style: italic;
+      color: grey;
+    }
+
+    /* Document style */
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #app {
+      width: 50%;
+      height: 70%;
+      padding: 30px;
+      border: 1px solid grey;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Title section */
+
     #title {
       font-size: 30px;
       margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Form section */
+
+    #form {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #form > input {
+      width: 60%;
+      height: 30px;
+      margin-right: 10px;
+    }
+    .form-actions {
+      display: flex;
+    }
+
+    /* Tasks */
+
+    #tasks {
+      height: 100%;
+      overflow-y: scroll;
+      padding: 20px;
     }
     .task {
       border: 1px solid grey;
       border-radius: 5px;
+      height: 40px;
       padding: 5px 10px;
       margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .task-title {
+      flex-grow: 1;
+      text-align: left;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .task-actions {
+      display: flex;
     }
   </style>
 </head>
 
-<body id="app">
+<body>
+  <div id="app">
 
-  <div id="title">
-    TODO app
-  </div>
+    <div id="title">
+      TODO app
+    </div>
 
-  <div>
-    <input
-      placeholder="task"
-      v-model="taskTitle"
-      @keyup.enter="addTask"
-    />
-    <button @click="addTask">OK</button>
-    <div v-for="(task, index) in tasks" class="task">
-      {{ task.title }}
-      <span>
-        <button @click="deleteTask(index)">x</button>
-      </span>
+
+    <div id="form">
+      <input
+        placeholder="What you gonna do?"
+        v-model="taskTitle"
+        @keyup.enter="addTask"
+      />
+
+      <div class="form-actions" v-if="edit">
+        <div class="button" @click="newTitle">
+          <div class="fa-solid fa-pen-to-square"></div>
+        </div>
+        <div class="button" @click="cancelEdit">
+          <div class="fa-solid fa-ban"></div>
+        </div>
+      </div>
+
+      <div class="form-actions" v-else>
+        <div class="button" @click="addTask">
+          <div class="fa-solid fa-plus"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tasks">
+      <div v-for="task in tasks" class="task">
+
+        <div class="button" @click="toggleDone(task)">
+          <div
+            v-if="task.done"
+            class="fa-regular fa-square-check"
+          ></div>
+          <div
+            v-else
+            class="fa-regular fa-square"
+          ></div>
+        </div>
+
+        <div :class="{'task-title': true, strike: task.done}">
+          {{ task.title }}
+        </div>
+
+        <div class="task-actions">
+          <div class="button" @click="editTask(task)">
+            <div class="fa-solid fa-pen-to-square"></div>
+          </div>
+          <div class="button" @click="deleteTask(task.id)">
+            <div class="fa-solid fa-trash"></div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
   <script>
     const { createApp } = Vue
-
     createApp({
+
       data() {
         return {
+          loading: true,
+          edit: false,
           taskTitle: '',
           tasks: [],
-          apiUrl: 'http://localhost:8000',
+          // removing trailing slash after URL for clarity
+          apiUrl: window.location.toString().slice(0, -1),
         }
       },
+
       async mounted() {
         await this.getTasks()
       },
+
       methods: {
-        async getTasks() {
-          const request = await axios.get(`${this.apiUrl}/todos`)
-          this.tasks = request.data.tasks
+        editTask(task) {
+          this.taskTitle = task.title
+          this.edit = task.id
         },
+        cancelEdit() {
+          this.edit = null
+          this.taskTitle = ''
+        },
+
+        async getTasks() {
+          const response = await axios.get(`${this.apiUrl}/task/list`)
+          this.tasks = response.data.tasks
+          this.loading = false
+        },
+
         async addTask() {
-          // this.tasks.push(this.taskTitle)
-          const response = await axios.post(`${this.apiUrl}/todo`, {
+          this.loading = true
+          console.log(this.taskTitle)
+          const response = await axios.post(`${this.apiUrl}/task`, {
             title: this.taskTitle,
           })
           this.taskTitle = ''
           await this.getTasks()
         },
-        deleteTask(index) {
-          this.tasks.splice(index, 1)
+        
+        async deleteTask(id) {
+          this.loading = true
+          const response = await axios.delete(`${this.apiUrl}/task/${id}`)
+          await this.getTasks()
         },
+
+        async newTitle() {
+          this.loading = true
+          const response = await axios.put(`${this.apiUrl}/task`, {
+            id: this.edit,
+            new_title: this.taskTitle,
+          })
+          this.edit = null
+          this.taskTitle = ''
+          await this.getTasks()
+        },
+
+        async toggleDone(task) {
+          this.loading = true
+          const new_done = !task.done
+          const response = await axios.put(`${this.apiUrl}/task`, {
+            id: task.id,
+            new_done,
+          })
+          await this.getTasks()
+        },
+
       },
     }).mount('#app')
   </script>
 
 </body>
-
