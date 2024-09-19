@@ -24,7 +24,11 @@
   </div>
 
   <div>
-    <input placeholder="task" v-model="taskTitle"/>
+    <input
+      placeholder="task"
+      v-model="taskTitle"
+      @keyup.enter="addTask"
+    />
     <button @click="addTask">OK</button>
     <div v-for="(task, index) in tasks" class="task">
       {{ task.title }}
@@ -42,7 +46,7 @@
         return {
           taskTitle: '',
           tasks: [],
-          apiUrl: 'http://localhost:8000'
+          apiUrl: 'http://localhost:8000',
         }
       },
       async mounted() {
@@ -53,13 +57,13 @@
           const request = await axios.get(`${this.apiUrl}/todos`)
           this.tasks = request.data.tasks
         },
-        async createTask() {
+        async addTask() {
           // this.tasks.push(this.taskTitle)
-          const response = await fetch('localhost:8000/task', {
-            method: 'POST',
-            body: { title: this.taskTitle },
+          const response = await axios.post(`${this.apiUrl}/todo`, {
+            title: this.taskTitle,
           })
           this.taskTitle = ''
+          await this.getTasks()
         },
         deleteTask(index) {
           this.tasks.splice(index, 1)

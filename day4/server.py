@@ -2,9 +2,9 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-@app.get("/")
-async def hello():
-  return {"message": "Hello World"}
+# @app.get("/")
+# async def hello():
+#   return {"message": "Hello World"}
 
 from pydantic import BaseModel
 from typing import Optional
@@ -17,6 +17,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
 )
+
+from fastapi.responses import HTMLResponse
+@app.get("/", response_class=HTMLResponse)
+def get_index():
+  with open('index.html', 'r') as file:
+    return file.read()    
 
 class Task(BaseModel):
   title: str
